@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevNotes Studio — AI Notes Beautifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon">⬡</span>
+    <span class="brand-text">DevNotes <em>Studio</em></span>
+  </div>
+  <div class="nav-center">
+    <button class="nav-tab active" data-tab="editor" onclick="switchMobileTab('editor')">✏️ Editor</button>
+    <button class="nav-tab" data-tab="preview" onclick="switchMobileTab('preview')">👁 Preview</button>
+    <button class="nav-tab" data-tab="settings" onclick="switchMobileTab('settings')">⚙️ Settings</button>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-help" onclick="toggleHelp()" title="Help Guide (Ctrl+H)">❔</button>
+    <button class="btn-export-quick" onclick="quickExportPDF()">⬇ Export</button>
+  </div>
+</nav>
+
+<!-- MAIN APP LAYOUT -->
+<div class="app-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+
+      <!-- TEMPLATES SECTION -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>🎨 Templates</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <div class="theme-grid">
+            <button class="theme-btn active" data-theme="vscode" onclick="applyTheme('vscode')">
+              <span class="theme-dot" style="background:#007acc"></span>VS Code Dark
+            </button>
+            <button class="theme-btn" data-theme="dracula" onclick="applyTheme('dracula')">
+              <span class="theme-dot" style="background:#bd93f9"></span>Dracula
+            </button>
+            <button class="theme-btn" data-theme="monokai" onclick="applyTheme('monokai')">
+              <span class="theme-dot" style="background:#f92672"></span>Monokai
+            </button>
+            <button class="theme-btn" data-theme="onedark" onclick="applyTheme('onedark')">
+              <span class="theme-dot" style="background:#61afef"></span>One Dark Pro
+            </button>
+            <button class="theme-btn" data-theme="minimal" onclick="applyTheme('minimal')">
+              <span class="theme-dot" style="background:#333"></span>Minimal White
+            </button>
+            <button class="theme-btn" data-theme="obsidian" onclick="applyTheme('obsidian')">
+              <span class="theme-dot" style="background:#7f6df2"></span>Obsidian
+            </button>
+            <button class="theme-btn" data-theme="cyberpunk" onclick="applyTheme('cyberpunk')">
+              <span class="theme-dot" style="background:#ff0090"></span>Cyberpunk Neon
+            </button>
+            <button class="theme-btn" data-theme="amoled" onclick="applyTheme('amoled')">
+              <span class="theme-dot" style="background:#00ff9f"></span>AMOLED Black
+            </button>
+            <button class="theme-btn" data-theme="hacker" onclick="applyTheme('hacker')">
+              <span class="theme-dot" style="background:#00ff41"></span>Hacker Green
+            </button>
+            <button class="theme-btn" data-theme="pastel" onclick="applyTheme('pastel')">
+              <span class="theme-dot" style="background:#f6a0d0"></span>Soft Pastel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT SECTION -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>📤 Export</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <div class="export-group">
+            <label class="ctrl-label">Quality Preset</label>
+            <select class="ctrl-select" id="exportQuality">
+              <option value="standard">Standard</option>
+              <option value="high" selected>High</option>
+              <option value="ultrahd">Ultra HD (4K)</option>
+            </select>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Export Ratio</label>
+            <select class="ctrl-select" id="exportRatio">
+              <option value="a4portrait">A4 Portrait</option>
+              <option value="a4landscape">A4 Landscape</option>
+              <option value="instagram">Instagram Post</option>
+              <option value="mobilewallpaper">Mobile Wallpaper</option>
+              <option value="desktopwallpaper">Desktop Wallpaper</option>
+            </select>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn pdf" onclick="exportPDF()">📄 PDF</button>
+            <button class="export-btn png" onclick="exportPNG()">🖼 PNG</button>
+            <button class="export-btn jpg" onclick="exportJPG()">📷 JPG</button>
+            <button class="export-btn html" onclick="exportHTML()">🌐 HTML</button>
+            <button class="export-btn md" onclick="exportMD()">📝 MD</button>
+          </div>
+          <button class="btn-pagebreak" onclick="insertPageBreak()">➕ Insert Page Break</button>
+        </div>
+      </div>
+
+      <!-- FONT SECTION -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>🔤 Typography</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <div class="export-group">
+            <label class="ctrl-label">Body Font</label>
+            <select class="ctrl-select" id="bodyFont" onchange="applyFont()">
+              <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+              <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+              <option value="'Syne', sans-serif">Syne</option>
+              <option value="Georgia, serif">Georgia</option>
+              <option value="'Courier New', monospace">Courier New</option>
+            </select>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Font Size</label>
+            <input type="range" class="ctrl-range" id="fontSize" min="12" max="22" value="15" oninput="applyFontSize(this.value)">
+            <span class="range-val" id="fontSizeVal">15px</span>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Line Height</label>
+            <input type="range" class="ctrl-range" id="lineHeight" min="1.2" max="2.5" step="0.1" value="1.7" oninput="applyLineHeight(this.value)">
+            <span class="range-val" id="lineHeightVal">1.7</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLOR CUSTOMIZATION -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>🎨 Colors</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <div class="color-grid">
+            <div class="color-item">
+              <label>Preview BG</label>
+              <input type="color" id="c-previewBg" oninput="applyColor('--preview-bg', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Heading</label>
+              <input type="color" id="c-heading" oninput="applyColor('--heading-color', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Body Text</label>
+              <input type="color" id="c-body" oninput="applyColor('--body-text', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Accent</label>
+              <input type="color" id="c-accent" oninput="applyColor('--accent-color', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Code BG</label>
+              <input type="color" id="c-codeBg" oninput="applyColor('--code-bg', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Code Text</label>
+              <input type="color" id="c-codeText" oninput="applyColor('--code-text', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Card BG</label>
+              <input type="color" id="c-cardBg" oninput="applyColor('--card-bg', this.value)">
+            </div>
+            <div class="color-item">
+              <label>Glow Color</label>
+              <input type="color" id="c-glow" oninput="applyColor('--glow-color', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLOW & EFFECTS -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>✨ Effects</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <div class="export-group">
+            <label class="ctrl-label">Glow Intensity</label>
+            <input type="range" class="ctrl-range" id="glowIntensity" min="0" max="30" value="10" oninput="applyGlow(this.value)">
+            <span class="range-val" id="glowVal">10px</span>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Border Radius</label>
+            <input type="range" class="ctrl-range" id="borderRadius" min="0" max="24" value="8" oninput="applyBorderRadius(this.value)">
+            <span class="range-val" id="radiusVal">8px</span>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Card Blur</label>
+            <input type="range" class="ctrl-range" id="cardBlur" min="0" max="20" value="8" oninput="applyBlur(this.value)">
+            <span class="range-val" id="blurVal">8px</span>
+          </div>
+          <div class="export-group">
+            <label class="ctrl-label">Export Padding</label>
+            <input type="range" class="ctrl-range" id="exportPadding" min="10" max="80" value="40" oninput="applyExportPadding(this.value)">
+            <span class="range-val" id="paddingVal">40px</span>
+          </div>
+          <div class="toggle-row">
+            <label>Animated BG</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="animatedBg" onchange="toggleAnimatedBg(this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Grid Overlay</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="gridOverlay" onchange="toggleGridOverlay(this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Watermark</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="watermark" onchange="toggleWatermark(this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM THEME -->
+      <div class="sidebar-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span>💾 My Themes</span><span class="chevron">▾</span>
+        </div>
+        <div class="section-body">
+          <input type="text" class="ctrl-input" id="themeName" placeholder="Theme name...">
+          <div class="theme-action-btns">
+            <button class="tab-btn" onclick="saveCustomTheme()">💾 Save</button>
+            <button class="tab-btn" onclick="exportTheme()">📤 Export</button>
+            <button class="tab-btn" onclick="importThemeFile()">📥 Import</button>
+            <button class="tab-btn danger" onclick="resetTheme()">↺ Reset</button>
+          </div>
+          <div id="savedThemesList"></div>
+          <input type="file" id="themeFileInput" accept=".json" style="display:none" onchange="handleThemeImport(event)">
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- CENTER: EDITOR -->
+  <main class="editor-panel" id="editorPanel">
+    <div class="editor-toolbar">
+      <div class="toolbar-left">
+        <span class="editor-label">✏️ Markdown Editor</span>
+        <button class="tool-btn" onclick="insertTemplate('qna')" title="Insert Q&A">Q&A</button>
+        <button class="tool-btn" onclick="insertTemplate('code')" title="Insert Code Block">{ }</button>
+        <button class="tool-btn" onclick="insertTemplate('note')" title="Insert Note Card">📌</button>
+        <button class="tool-btn" onclick="insertTemplate('table')" title="Insert Table">⊞</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="tool-btn" onclick="clearEditor()" title="Clear">🗑</button>
+        <button class="tool-btn" onclick="loadSample()" title="Load Sample">📂</button>
+        <span class="autosave-indicator" id="autosaveIndicator">✓ Saved</span>
+      </div>
+    </div>
+    <div class="editor-drop-zone" id="dropZone">
+      <textarea 
+        class="editor-textarea" 
+        id="editor" 
+        placeholder="Paste your AI-generated notes here...
+
+# Example Heading
+
+Q1. What is a Stack?
+A Stack is a linear data structure...
+
+```python
+stack = []
+stack.append(1)
+print(stack)
+```
+
+NOTE: This is an important note!
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Data     | Value    |"
+        oninput="onEditorInput()"
+        spellcheck="false"
+      ></textarea>
+      <div class="drop-overlay" id="dropOverlay">
+        <div class="drop-message">📂 Drop .md or .txt file here</div>
+      </div>
+    </div>
+    <div class="editor-footer">
+      <span id="charCount">0 chars</span>
+      <span id="wordCount">0 words</span>
+      <span id="lineCount">0 lines</span>
+    </div>
+  </main>
+
+  <!-- RIGHT: PREVIEW -->
+  <section class="preview-panel" id="previewPanel">
+    <div class="preview-toolbar">
+      <span class="preview-label">👁 Live Preview</span>
+      <div class="preview-controls">
+        <button class="tool-btn" onclick="zoomPreview(-10)" title="Zoom Out">−</button>
+        <span class="zoom-display" id="zoomDisplay">100%</span>
+        <button class="tool-btn" onclick="zoomPreview(10)" title="Zoom In">+</button>
+        <button class="tool-btn" onclick="resetZoom()" title="Reset">↺</button>
+        <button class="tool-btn" onclick="toggleA4Mode()" id="a4ModeBtn" title="A4 Mode">A4</button>
+      </div>
+    </div>
+    <div class="preview-scroll-area" id="previewScrollArea">
+      <div class="preview-content" id="previewContent">
+        <div class="preview-inner" id="previewInner">
+          <!-- RENDERED CONTENT GOES HERE -->
+        </div>
+        <div class="watermark-text" id="watermarkText">DevNotes Studio</div>
+        <div class="grid-overlay-layer" id="gridOverlayLayer"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpOverlay" onclick="if(event.target===this)toggleHelp()">
+  <div class="help-modal">
+    <div class="help-header">
+      <h2>❔ Help Guide</h2>
+      <button class="modal-close" onclick="toggleHelp()">✕</button>
+    </div>
+    <div class="help-tabs">
+      <button class="help-tab active" onclick="switchHelpTab(this,'markdown')">Markdown</button>
+      <button class="help-tab" onclick="switchHelpTab(this,'formatting')">Formatting</button>
+      <button class="help-tab" onclick="switchHelpTab(this,'shortcuts')">Shortcuts</button>
+      <button class="help-tab" onclick="switchHelpTab(this,'export')">Export</button>
+    </div>
+    <div class="help-body">
+
+      <div class="help-panel active" id="help-markdown">
+        <h3>Markdown Syntax</h3>
+        <div class="help-table">
+          <div class="help-row"><code># Heading 1</code><span>Large heading</span></div>
+          <div class="help-row"><code>## Heading 2</code><span>Medium heading</span></div>
+          <div class="help-row"><code>### Heading 3</code><span>Small heading</span></div>
+          <div class="help-row"><code>**Bold Text**</code><span>Bold text</span></div>
+          <div class="help-row"><code>*Italic Text*</code><span>Italic text</span></div>
+          <div class="help-row"><code>`inline code`</code><span>Inline code</span></div>
+          <div class="help-row"><code>- List item</code><span>Bullet list</span></div>
+          <div class="help-row"><code>1. List item</code><span>Numbered list</span></div>
+          <div class="help-row"><code>&gt; Blockquote</code><span>Quoted text</span></div>
+          <div class="help-row"><code>---</code><span>Horizontal line</span></div>
+          <div class="help-row"><code>| Col | Col |</code><span>Table row</span></div>
+        </div>
+
+        <h3>Code Blocks</h3>
+        <pre class="help-code">```python
+print("Hello World")
+```
+
+```javascript
+const x = 42;
+console.log(x);
+```</pre>
+        <p>Supported: python, javascript, java, c, cpp, html, css, php, sql, bash</p>
+      </div>
+
+      <div class="help-panel" id="help-formatting">
+        <h3>Auto-Format Features</h3>
+        <div class="help-block">
+          <strong>Question Cards</strong>
+          <pre class="help-code">Q1. What is a Stack?
+A stack is a linear data structure...</pre>
+          <p>→ Renders as futuristic numbered question card</p>
+        </div>
+        <div class="help-block">
+          <strong>Special Alert Boxes</strong>
+          <pre class="help-code">NOTE: Important information here
+IMPORTANT: Critical detail
+TIP: Helpful hint
+WARNING: Be careful about this</pre>
+          <p>→ Renders as colored glowing alert cards</p>
+        </div>
+        <div class="help-block">
+          <strong>Output Blocks</strong>
+          <pre class="help-code">Output:
+Hello World
+Result: 42</pre>
+          <p>→ Renders as terminal-style output box</p>
+        </div>
+        <div class="help-block">
+          <strong>Page Break</strong>
+          <p>Click "Insert Page Break" button in sidebar or use the button in toolbar. Separates content into clean PDF pages.</p>
+        </div>
+      </div>
+
+      <div class="help-panel" id="help-shortcuts">
+        <h3>Keyboard Shortcuts</h3>
+        <div class="help-table">
+          <div class="help-row"><kbd>Ctrl + H</kbd><span>Open/close Help</span></div>
+          <div class="help-row"><kbd>Ctrl + S</kbd><span>Save to localStorage</span></div>
+          <div class="help-row"><kbd>Ctrl + E</kbd><span>Export PDF</span></div>
+          <div class="help-row"><kbd>Ctrl + Shift + P</kbd><span>Export PNG</span></div>
+          <div class="help-row"><kbd>Ctrl + Z</kbd><span>Undo (in editor)</span></div>
+          <div class="help-row"><kbd>Tab</kbd><span>Insert 2 spaces</span></div>
+        </div>
+      </div>
+
+      <div class="help-panel" id="help-export">
+        <h3>Export Guide</h3>
+        <div class="help-block">
+          <strong>PDF Export</strong>
+          <p>Exports selectable text as A4 PDF with proper margins, page numbers, and headers.</p>
+        </div>
+        <div class="help-block">
+          <strong>PNG / JPG Export</strong>
+          <p>Renders preview at 2x resolution for crisp retina quality. Ultra HD mode exports at 4x.</p>
+        </div>
+        <div class="help-block">
+          <strong>HTML Export</strong>
+          <p>Exports a standalone HTML file with all styles embedded.</p>
+        </div>
+        <div class="help-block">
+          <strong>Export Ratios</strong>
+          <ul>
+            <li>A4 Portrait — Standard document format</li>
+            <li>A4 Landscape — Wide format</li>
+            <li>Instagram Post — 1080×1080</li>
+            <li>Mobile Wallpaper — 1080×1920</li>
+            <li>Desktop Wallpaper — 2560×1440</li>
+          </ul>
+        </div>
+        <div class="help-block">
+          <strong>Custom Themes</strong>
+          <p>Customize all colors and save as named theme. Export/import theme as JSON to share with others.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
