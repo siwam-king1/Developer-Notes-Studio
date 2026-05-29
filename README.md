@@ -6,7 +6,7 @@ A futuristic AI-powered Developer Notes Studio built for students, programmers, 
 
 # ✨ Features
 
-* 🧠 Paste AI-generated notes from Ai
+* 🧠 Paste AI-generated notes from AI
 * 🎨 Beautiful futuristic themes
 * ⚡ Real-time markdown rendering
 * 💻 Syntax-highlighted code blocks
